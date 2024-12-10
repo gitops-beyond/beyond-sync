@@ -1,0 +1,35 @@
+# Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+*.out
+*.o
+*.a
+
+# Build artifacts
+bin/
+build/
+dist/
+
+# Go test binaries
+*.test
+
+# Go Modules
+/vendor/
+
+# Logs
+*.log
+
+# Temporary files and directories
+*.tmp
+
+# OS-specific files
+.DS_Store
+
+# IDE-specific files
+.idea/
+.vscode/
+
+# Other
+*.env
