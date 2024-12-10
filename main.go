@@ -1,11 +1,14 @@
 package main
 
 import (
-    "github.com/gin-gonic/gin"
-    "github.com/gitops-beyond/beyond-sync/handlers"
-    "github.com/joho/godotenv"
-	"os"
+    "os"
     "log"
+
+    "github.com/gin-gonic/gin"
+    "github.com/joho/godotenv"
+
+    "github.com/gitops-beyond/beyond-sync/handlers"
+    "github.com/gitops-beyond/beyond-sync/webhook"
 )
 
 func main() {
@@ -14,6 +17,9 @@ func main() {
     if os.Getenv("PORT") == "" {
         log.Fatal("PORT env variable missing")
     }
+
+    w := &webhook.Webhook{}
+    w.TestAuth()
 
     r := gin.Default()
 
