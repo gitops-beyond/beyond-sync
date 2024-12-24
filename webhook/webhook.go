@@ -6,12 +6,13 @@ import (
 	"reflect"
 	"strings"
 	"fmt"
+	"encoding/json"
 
 	"github.com/go-resty/resty/v2"
 )
 
 type Webhook struct {
-	Repo string
+	RepoName string
 	Username string
 	Token string
 }
@@ -33,7 +34,7 @@ func(w *Webhook) Init(){
 	}
 }
 
-func(w *Webhook) TestAuth(){
+func (w* Webhook) GetLastCommit() (string, error){
 	w.Init()
 
 	// Create an HTTP client using resty
@@ -41,13 +42,33 @@ func(w *Webhook) TestAuth(){
 	// Make the GET request to GitHub API with the token for authentication
 	resp, err := client.R().
 		SetHeader("Authorization", "token "+w.Token). // Authenticate using PAT
-		Get(fmt.Sprintf("https://api.github.com/repos/%s/%s", w.Username, w.Repo))
+		Get(fmt.Sprintf("https://api.github.com/repos/%s/%s/commits?path=ansible", w.Username, w.RepoName))
 
 	// Handle any errors that might have occurred
 	if err != nil {
 		log.Fatalf("Error while fetching repo info: %v", err)
 	}
 
-	// Print out the response body (repository details)
-	fmt.Printf("Response: %s\n", resp.String())
+	// Check the HTTP status code
+	if resp.StatusCode() != 200 {
+		log.Fatalf("Error: received status code %d\nResponse: %s", resp.StatusCode(), resp.String())
+	}
+
+	// Parse the JSON response
+	var commits []map[string]interface{}
+	err = json.Unmarshal(resp.Body(), &commits)
+	if err != nil {
+		log.Fatalf("Error parsing JSON response: %v", err)
+	}
+
+	// Find the first `sha` key value
+	if len(commits) > 0 {
+		if sha, ok := commits[0]["sha"].(string); ok {
+			return sha, nil
+		} else {
+			return "", fmt.Errorf("SHA key not found in the last commit")
+		}
+	} else {
+		return "", fmt.Errorf("No commits found in the response")
+	}
 }
