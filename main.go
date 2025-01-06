@@ -11,5 +11,5 @@ func main() {
 	godotenv.Load()
     
 	//webhook.Sync()
-	ansible.CloneRepo()
+	ansible.Run()
 }

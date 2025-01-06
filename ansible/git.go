@@ -9,7 +9,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 )
 
-func CloneRepo(){
+func cloneRepo() error{
 	repoUrl := fmt.Sprintf("https://github.com/%s/%s", os.Getenv("USERNAME"), os.Getenv("REPONAME"))
 	log.Printf("Cloning repo %s", repoUrl)
 	
@@ -21,7 +21,17 @@ func CloneRepo(){
 		},
 		Depth: 1,
 	})
+	//_, err = os.ReadDir("./clonedRepo/")
 	if err != nil {
-		log.Fatalf("Failed to clone repo %s: %s", repoUrl, err)
+		return fmt.Errorf("Failed to clone repo %s: %s", repoUrl, err)
 	}
+	return nil
+}
+
+func removeRepo() error{
+	err := os.RemoveAll("./clonedRepo")
+	if err != nil {
+		return fmt.Errorf("Failed to remove repo: %v", err)
+	}
+	return nil
 }
