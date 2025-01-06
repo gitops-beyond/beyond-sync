@@ -33,3 +33,6 @@ dist/
 
 # Other
 *.env
+
+# Runtime
+clonedRepo/
