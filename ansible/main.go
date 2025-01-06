@@ -14,5 +14,11 @@ func Run(){
 		log.Fatalf("ERROR %v", err)
 	}
 
+	err = pingAllHosts()
+	if err != nil{
+		removeRepo()
+		log.Printf("ERROR %v", err)
+	}
+
 	removeRepo()
 }
