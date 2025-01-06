@@ -22,13 +22,14 @@ func lookForAnsiblePrerequisites() error {
 }
 
 func pingAllHosts() error {
+	os.Chdir("./clonedRepo/ansible")
 	pingCmd := exec.Command("ansible", "all", "-m", "ping")
 	byteOutput, err := pingCmd.CombinedOutput()
+	os.Chdir("../../")
 	if err != nil {
 		return err
 	}
 	output := string(byteOutput)
-	fmt.Println(output)
 	if strings.Contains(output, "[WARNING]: No inventory was parsed"){
 		return fmt.Errorf("Inventory is not present")
 	}
