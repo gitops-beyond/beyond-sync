@@ -20,5 +20,11 @@ func Run(){
 		log.Printf("ERROR %v", err)
 	}
 
+	err = runPlaybook()
+	if err != nil{
+		removeRepo()
+		log.Printf("ERROR %v", err)
+	}
+
 	removeRepo()
 }

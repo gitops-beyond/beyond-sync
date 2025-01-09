@@ -3,6 +3,7 @@ package webhook
 import (
 	"log"
 	"time"
+	"github.com/gitops-beyond/beyond-sync/ansible"
 )
 
 func Sync() {
@@ -17,6 +18,7 @@ func Sync() {
 		if sha != newSha {
 			sha = newSha
 			log.Printf("Sync is triggered with new commit hash value of %s", sha)
+			ansible.Run()
 		} else {
 			log.Println("Sleep")
 			time.Sleep(30 * time.Second)

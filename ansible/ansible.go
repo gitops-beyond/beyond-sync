@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"log"
 )
 
 func lookForAnsiblePrerequisites() error {
@@ -23,7 +24,7 @@ func lookForAnsiblePrerequisites() error {
 
 func pingAllHosts() error {
 	os.Chdir("./clonedRepo/ansible")
-	pingCmd := exec.Command("ansible", "all", "-m", "ping")
+	pingCmd := exec.Command("ansible", "all", "-i", "inventory", "-m", "ping")
 	byteOutput, err := pingCmd.CombinedOutput()
 	os.Chdir("../../")
 	if err != nil {
@@ -32,6 +33,18 @@ func pingAllHosts() error {
 	output := string(byteOutput)
 	if strings.Contains(output, "[WARNING]: No inventory was parsed"){
 		return fmt.Errorf("Inventory is not present")
+	}
+	return nil
+}
+
+func runPlaybook() error {
+	os.Chdir("./clonedRepo/ansible")
+	pingCmd := exec.Command("ansible-playbook", "-i", "inventory", "playbook.yml")
+	byteOutput, err := pingCmd.CombinedOutput()
+	log.Println(string(byteOutput))
+	os.Chdir("../../")
+	if err != nil {
+		return err
 	}
 	return nil
 }
