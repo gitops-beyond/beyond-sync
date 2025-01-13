@@ -5,14 +5,15 @@ import "log"
 func Run(){
 	err := cloneRepo()
 	if err != nil{
-		log.Fatalf("ERROR %v", err)
+		log.Printf("ERROR %v", err)
+		addNonAnsibleErrorRecord()
 		return
 	}
 
 	err = lookForAnsiblePrerequisites()
 	if err != nil{
 		removeRepo()
-		log.Fatalf("ERROR %v", err)
+		log.Printf("ERROR %v", err)
 		return
 	}
 
