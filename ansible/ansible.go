@@ -26,11 +26,11 @@ func pingAllHosts() error {
 	os.Chdir("./clonedRepo/ansible")
 	pingCmd := exec.Command("ansible", "all", "-i", "inventory", "-m", "ping")
 	byteOutput, err := pingCmd.CombinedOutput()
+	output := string(byteOutput)
 	os.Chdir("../../")
 	if err != nil {
-		return err
+		return fmt.Errorf(output)
 	}
-	output := string(byteOutput)
 	if strings.Contains(output, "[WARNING]: No inventory was parsed"){
 		return fmt.Errorf("Inventory is not present")
 	}

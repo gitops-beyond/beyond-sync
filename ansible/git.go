@@ -21,7 +21,7 @@ func cloneRepo() error{
 		},
 		Depth: 1,
 	})
-	//_, err = os.ReadDir("./clonedRepo/")
+
 	if err != nil {
 		return fmt.Errorf("Failed to clone repo %s: %s", repoUrl, err)
 	}
