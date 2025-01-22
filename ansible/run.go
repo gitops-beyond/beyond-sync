@@ -1,19 +1,23 @@
 package ansible
 
-import "log"
+import (
+	"log"
+)
 
-func Run(){
+func Run(sha string){
 	err := cloneRepo()
+	defer removeRepo()
+
 	if err != nil{
-		log.Printf("ERROR %v", err)
-		addNonAnsibleErrorRecord()
+		log.Printf("ERROR: %s", err.Error())
+		addSyncRecord(sha, "Failed", err.Error())
 		return
 	}
 
 	err = lookForAnsiblePrerequisites()
 	if err != nil{
-		removeRepo()
-		log.Printf("ERROR %v", err)
+		log.Printf("ERROR: %s", err.Error())
+		addSyncRecord(sha, "Failed", err.Error())
 		return
 	}
 
@@ -30,6 +34,4 @@ func Run(){
 		log.Printf("ERROR %v", err)
 		return
 	}
-
-	removeRepo()
 }

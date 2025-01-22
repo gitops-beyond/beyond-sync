@@ -18,7 +18,7 @@ func Sync() {
 		if sha != newSha {
 			sha = newSha
 			log.Printf("Sync is triggered with new commit hash value of %s", sha)
-			ansible.Run()
+			ansible.Run(sha)
 		} else {
 			log.Println("Sleep")
 			time.Sleep(30 * time.Second)

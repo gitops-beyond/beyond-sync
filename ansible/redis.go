@@ -1,21 +1,29 @@
 package ansible
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"time"
-	"context"
 
 	"github.com/redis/go-redis/v9"
 )
 
-func addNonAnsibleErrorRecord() {
+type RedisValue struct {
+    Sha string `json:"sha"`
+    Status string `json:"status"`
+    Message string `json:"message"`
+}
+
+var rdb = redis.NewClient(&redis.Options{
+    Addr:     fmt.Sprintf("%s:6379", os.Getenv("REDIS_HOST")),
+    Password: "",
+    DB:       0,
+})
+
+func addSyncRecord(sha string, status string, message string) {
     ctx := context.Background()
-    rdb := redis.NewClient(&redis.Options{
-        Addr:     fmt.Sprintf("%s:6379", os.Getenv("REDIS_HOST")),
-        Password: "",
-        DB:       0,
-    })
     defer rdb.Close()
 
     // Check connection first
@@ -24,9 +32,16 @@ func addNonAnsibleErrorRecord() {
         return
     }
 
-    // Set the value using the context
+    // Set data
     key := time.Now().Format("2006-01-02 15:04:05")
-    if err := rdb.Set(ctx, string(key), "test", 0).Err(); err != nil {
+    value, err := json.Marshal(RedisValue{sha, status, message})
+    if err != nil {
+        fmt.Printf("Error encoding json value: %v\n", err)
+        return
+    }
+
+    // Set the value using the context
+    if err := rdb.Set(ctx, string(key), string(value), 0).Err(); err != nil {
         fmt.Printf("Error setting value in Redis: %v\n", err)
         return
     }
