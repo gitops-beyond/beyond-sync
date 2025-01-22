@@ -37,14 +37,14 @@ func pingAllHosts() error {
 	return nil
 }
 
-func runPlaybook() error {
+func runPlaybook() (string, error) {
 	os.Chdir("./clonedRepo/ansible")
 	pingCmd := exec.Command("ansible-playbook", "-i", "inventory", "playbook.yml")
 	byteOutput, err := pingCmd.CombinedOutput()
 	log.Println(string(byteOutput))
 	os.Chdir("../../")
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	return string(byteOutput), nil
 }

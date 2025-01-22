@@ -23,15 +23,16 @@ func Run(sha string){
 
 	err = pingAllHosts()
 	if err != nil{
-		removeRepo()
-		log.Printf("ERROR %v", err)
+		log.Printf("ERROR: %s", err.Error())
+		addSyncRecord(sha, "Failed", err.Error())
 		return
 	}
 
-	err = runPlaybook()
+	output, err := runPlaybook()
 	if err != nil{
-		removeRepo()
-		log.Printf("ERROR %v", err)
+		log.Printf("ERROR: %s", err.Error())
+		addSyncRecord(sha, "Failed", err.Error())
 		return
 	}
+	addSyncRecord(sha, "Synced", output)
 }
