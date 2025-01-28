@@ -1,28 +1,13 @@
-package ansible
+package redis
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
 	"time"
-
-	"github.com/redis/go-redis/v9"
 )
 
-type RedisValue struct {
-    Sha string `json:"sha"`
-    Status string `json:"status"`
-    Message string `json:"message"`
-}
-
-var rdb = redis.NewClient(&redis.Options{
-    Addr:     fmt.Sprintf("%s:6379", os.Getenv("REDIS_HOST")),
-    Password: "",
-    DB:       0,
-})
-
-func addSyncRecord(sha string, status string, message string) {
+func AddSyncRecord(sha string, status string, message string) {
     ctx := context.Background()
     defer rdb.Close()
 
@@ -45,4 +30,16 @@ func addSyncRecord(sha string, status string, message string) {
         fmt.Printf("Error setting value in Redis: %v\n", err)
         return
     }
+}
+
+func GetAllSyncRecords() ([]string, error){
+    ctx := context.Background()
+    defer rdb.Close()
+
+    if err := rdb.Ping(ctx).Err(); err != nil {
+        return nil, fmt.Errorf("Error connecting to Redis: %v\n", err)
+    }
+
+    keys := rdb.Keys(ctx, "*").Val()
+    return keys, nil
 }
