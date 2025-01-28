@@ -2,12 +2,12 @@ package main
 
 import (
 	"github.com/joho/godotenv"
-	"github.com/gitops-beyond/beyond-sync/webhook"
+	"github.com/gitops-beyond/beyond-sync/internal/webhook"
 )
 
 func main() {
 	// Load environment variables from .env file
-	godotenv.Load()
+	godotenv.Load("../../.env")
     
 	webhook.Sync()
 }

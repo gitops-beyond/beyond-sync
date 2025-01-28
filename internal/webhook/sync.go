@@ -3,7 +3,7 @@ package webhook
 import (
 	"log"
 	"time"
-	"github.com/gitops-beyond/beyond-sync/ansible"
+	"github.com/gitops-beyond/beyond-sync/internal/ansible"
 )
 
 func Sync() {
