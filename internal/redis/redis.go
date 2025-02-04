@@ -3,9 +3,11 @@ package redis
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
-	"time"
 	"os"
+	"time"
+
 	"github.com/redis/go-redis/v9"
 )
 
@@ -58,13 +60,15 @@ func GetSyncRecords(query string) (map[string]RedisValue, error) {
 
     // Check connection first
     if err := rdb.Ping(ctx).Err(); err != nil {
-        return nil, fmt.Errorf("Error connecting to Redis: %v", err)
+        return nil, fmt.Errorf("failed connecting to Redis: %v", err)
     }
 
     // Get all keys
     keys, err := rdb.Keys(ctx, query).Result()
     if err != nil {
-        return nil, fmt.Errorf("Error getting keys from Redis: %v", err)
+        return nil, fmt.Errorf("failed getting keys from Redis: %v", err)
+    } else if len(keys) == 0 {
+        return nil, errors.New("key not found")
     }
 
     result := make(map[string]RedisValue)
@@ -73,12 +77,12 @@ func GetSyncRecords(query string) (map[string]RedisValue, error) {
     for _, key := range keys {
         value, err := rdb.Get(ctx, key).Result()
         if err != nil {
-            continue // Skip failed entries
+            continue
         }
         
         var redisValue RedisValue
         if err := json.Unmarshal([]byte(value), &redisValue); err != nil {
-            continue // Skip malformed entries
+            continue
         }
         
         result[key] = redisValue
