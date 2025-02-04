@@ -6,6 +6,6 @@ import(
 )
 
 func LoadRoutes(r *gin.Engine){
-	r.GET("/sync", handlers.GetAllSyncs)
-	r.GET("/sync/:timestamp", handlers.GetSyncByDate)
+	r.GET("/history", handlers.GetAllSyncs)
+	r.GET("/history/:timestamp", handlers.GetSyncByDate)
 }
