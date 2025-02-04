@@ -9,6 +9,12 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+type RedisValue struct {
+    Sha string `json:"sha"`
+    Status string `json:"status"`
+    Message string `json:"message"`
+}
+
 func AddSyncRecord(sha string, status string, message string) {
     rdb := redis.NewClient(&redis.Options{
         Addr:     fmt.Sprintf("%s:6379", os.Getenv("REDIS_HOST")),
@@ -26,7 +32,7 @@ func AddSyncRecord(sha string, status string, message string) {
     }
 
     // Set data
-    key := time.Now().Format("2006-01-02 15:04:05")
+    key := time.Now().Format("2006-01-02T15:04:05")
     value, err := json.Marshal(RedisValue{sha, status, message})
     if err != nil {
         fmt.Printf("Error encoding json value: %v\n", err)
@@ -40,7 +46,7 @@ func AddSyncRecord(sha string, status string, message string) {
     }
 }
 
-func GetAllSyncRecords() (map[string]RedisValue, error) {
+func GetSyncRecords(query string) (map[string]RedisValue, error) {
     rdb := redis.NewClient(&redis.Options{
         Addr:     fmt.Sprintf("%s:6379", os.Getenv("REDIS_HOST")),
         Password: "",
@@ -56,7 +62,7 @@ func GetAllSyncRecords() (map[string]RedisValue, error) {
     }
 
     // Get all keys
-    keys, err := rdb.Keys(ctx, "*").Result()
+    keys, err := rdb.Keys(ctx, query).Result()
     if err != nil {
         return nil, fmt.Errorf("Error getting keys from Redis: %v", err)
     }
