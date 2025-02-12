@@ -112,3 +112,22 @@ func PublishMessage() error {
 
     return nil
 }
+
+func Subscribe() (*redis.PubSub, error) {
+    rdb := redis.NewClient(&redis.Options{
+        Addr:     fmt.Sprintf("%s:6379", os.Getenv("REDIS_HOST")),
+        Password: "",
+        DB:       0,
+    })
+    
+    ctx := context.Background()
+
+    // Check connection first
+    if err := rdb.Ping(ctx).Err(); err != nil {
+        return nil, fmt.Errorf("failed connecting to Redis: %v", err)
+    }
+
+    sub := rdb.Subscribe(ctx, "triggers")
+
+    return sub, nil
+}
