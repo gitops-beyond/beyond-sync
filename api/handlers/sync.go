@@ -52,3 +52,13 @@ func GetSyncByDate(c *gin.Context) {
 
     c.JSON(200, response)
 }
+
+func TriggerSync(c *gin.Context) {
+    err := redis.PublishMessage()
+    if err != nil {
+        c.JSON(500, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(201, `{"Sync trigger is requested"}`)
+}

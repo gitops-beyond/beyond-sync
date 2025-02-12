@@ -90,3 +90,25 @@ func GetSyncRecords(query string) (map[string]RedisValue, error) {
 
     return result, nil
 }
+
+func PublishMessage() error {
+    rdb := redis.NewClient(&redis.Options{
+        Addr:     fmt.Sprintf("%s:6379", os.Getenv("REDIS_HOST")),
+        Password: "",
+        DB:       0,
+    })
+    defer rdb.Close()
+    ctx := context.Background()
+
+    // Check connection first
+    if err := rdb.Ping(ctx).Err(); err != nil {
+        return fmt.Errorf("failed connecting to Redis: %v", err)
+    }
+
+    err := rdb.Publish(ctx, "triggers", `sync trigger`).Err()
+    if err != nil {
+        return fmt.Errorf("failed publishing message in Redis: %v", err)
+    }
+
+    return nil
+}

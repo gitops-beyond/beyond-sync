@@ -8,4 +8,5 @@ import(
 func LoadRoutes(r *gin.Engine){
 	r.GET("/sync", handlers.GetAllSyncs)
 	r.GET("/sync/:timestamp", handlers.GetSyncByDate)
+	r.POST("/sync/trigger", handlers.TriggerSync)
 }
