@@ -60,5 +60,5 @@ func TriggerSync(c *gin.Context) {
         return
     }
 
-    c.JSON(201, `{"Sync trigger is requested"}`)
+    c.JSON(201, "Sync trigger is requested")
 }
