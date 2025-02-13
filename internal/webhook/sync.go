@@ -9,12 +9,12 @@ import (
 	"github.com/gitops-beyond/beyond-sync/internal/ansible"
 	"github.com/gitops-beyond/beyond-sync/internal/redis"
 )
-	
-var trigger bool = false
+
 
 func Sync() {
 	w := Webhook{}
 	sha := ""
+	var lock sync.Mutex
 
 	ctx := context.Background()
 	var wg sync.WaitGroup
@@ -29,13 +29,11 @@ func Sync() {
 			}
 
 			if sha != newSha {
+				lock.Lock()
 				sha = newSha
 				log.Printf("Sync is triggered with new commit hash value of %s", sha)
 				ansible.RunAnsibleSync(sha)
-			} else if trigger == true {
-				log.Printf("Sync is triggered with manual trigger and commit hash value of %s", sha)
-				ansible.RunAnsibleSync(sha)
-				trigger = false
+				lock.Unlock()
 			} else {
 				log.Println("Sleep")
 				time.Sleep(30 * time.Second)
@@ -58,7 +56,10 @@ func Sync() {
 				log.Printf("Redis subscription error: %v", err)
 				return
 			} else if len(msg.Payload) > 0 {
-				trigger = true
+				lock.Lock()
+				log.Printf("Sync is triggered with manual trigger and commit hash value of %s", sha)
+				ansible.RunAnsibleSync(sha)
+				lock.Unlock()
 			}
 		}
 	}()
