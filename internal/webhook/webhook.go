@@ -11,12 +11,14 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
+// Struct definition to set webook parameters
 type Webhook struct {
 	RepoName string
 	Username string
 	Token string
 }
 
+// Create Webhook object with field values from env vars
 func(w *Webhook) Init(){
 	// Use reflection to get the value of the struct
 	val := reflect.ValueOf(w).Elem()
@@ -34,7 +36,9 @@ func(w *Webhook) Init(){
 	}
 }
 
+// Create Webhook object with field values from env vars
 func (w* Webhook) GetLastCommit() (string, error){
+	// Create Webhook object
 	w.Init()
 
 	// Create an HTTP client using resty
