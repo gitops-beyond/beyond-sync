@@ -5,13 +5,16 @@ import (
 	"github.com/gitops-beyond/beyond-sync/internal/redis"
 )
 
+// SyncResponse represents a single sync operation result
 type SyncResponse struct {
-    Timestamp string     `json:"timestamp"`
+    Timestamp string          `json:"timestamp"`
     Data      redis.RedisValue `json:"data"`
 }
 
+// SyncListResponse is a collection of sync responses
 type SyncListResponse []SyncResponse
 
+// GetAllSyncs returns all sync records from Redis
 func GetAllSyncs(c *gin.Context) {
     redisRecords, err := redis.GetSyncRecords("*")
     if err != nil && err.Error() == "key not found"{
@@ -22,6 +25,7 @@ func GetAllSyncs(c *gin.Context) {
         return
     }
 
+    // Convert Redis records to response format
     response := make(SyncListResponse, 0)
     for timestamp, value := range redisRecords {
         sync := SyncResponse{
@@ -34,6 +38,7 @@ func GetAllSyncs(c *gin.Context) {
     c.JSON(200, response)
 }
 
+// GetSyncByDate returns a specific sync record by timestamp
 func GetSyncByDate(c *gin.Context) {
     redisKey := c.Param("timestamp")
     redisValue, err := redis.GetSyncRecords(redisKey)
@@ -53,6 +58,7 @@ func GetSyncByDate(c *gin.Context) {
     c.JSON(200, response)
 }
 
+// TriggerSync initiates a new sync operation
 func TriggerSync(c *gin.Context) {
     err := redis.PublishMessage()
     if err != nil {

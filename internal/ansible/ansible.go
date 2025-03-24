@@ -8,6 +8,7 @@ import (
 	"log"
 )
 
+// Check if target repo is cloned and Ansible installed on host
 func lookForAnsiblePrerequisites() error {
 	// Ansible folder in repo
 	_, err := os.ReadDir("./clonedRepo/ansible")
@@ -22,11 +23,16 @@ func lookForAnsiblePrerequisites() error {
 	return nil
 }
 
+// Check if all hosts are reachable
 func pingAllHosts() error {
+	// Go to cloned Ansible code
 	os.Chdir("./clonedRepo/ansible")
+	// Execute ansible ping command
 	pingCmd := exec.Command("ansible", "all", "-i", "inventory", "-m", "ping")
+	// Get the command output
 	byteOutput, err := pingCmd.CombinedOutput()
 	output := string(byteOutput)
+	// Go back to home dir
 	os.Chdir("../../")
 	if err != nil {
 		return fmt.Errorf(output)
@@ -37,11 +43,16 @@ func pingAllHosts() error {
 	return nil
 }
 
+// Run Ansible playbook
 func runPlaybook() (string, error) {
+	// Go to cloned Ansible code
 	os.Chdir("./clonedRepo/ansible")
+	// Execute ansible playbook
 	pingCmd := exec.Command("ansible-playbook", "-i", "inventory", "playbook.yml")
+	// Get the command output
 	byteOutput, err := pingCmd.CombinedOutput()
 	log.Println(string(byteOutput))
+	// Go back to home dir
 	os.Chdir("../../")
 	if err != nil {
 		return "", err
