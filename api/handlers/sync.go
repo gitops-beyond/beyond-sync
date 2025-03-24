@@ -14,7 +14,14 @@ type SyncResponse struct {
 // SyncListResponse is a collection of sync responses
 type SyncListResponse []SyncResponse
 
-// GetAllSyncs returns all sync records from Redis
+// GetAllSyncs godoc
+// @Summary      Get all sync records
+// @Description  Retrieves all sync records from Redis
+// @Tags         sync
+// @Accept       json
+// @Produce      json
+// @Success      200  {array}   SyncResponse
+// @Router       /sync [get]
 func GetAllSyncs(c *gin.Context) {
     redisRecords, err := redis.GetSyncRecords("*")
     if err != nil && err.Error() == "key not found"{
@@ -38,7 +45,15 @@ func GetAllSyncs(c *gin.Context) {
     c.JSON(200, response)
 }
 
-// GetSyncByDate returns a specific sync record by timestamp
+// GetSyncByDate godoc
+// @Summary      Get sync record by timestamp
+// @Description  Retrieves a specific sync record by its timestamp
+// @Tags         sync
+// @Accept       json
+// @Produce      json
+// @Param        timestamp   path      string  true  "Timestamp of the sync record"
+// @Success      200  {object}  SyncResponse
+// @Router       /sync/{timestamp} [get]
 func GetSyncByDate(c *gin.Context) {
     redisKey := c.Param("timestamp")
     redisValue, err := redis.GetSyncRecords(redisKey)
@@ -58,7 +73,14 @@ func GetSyncByDate(c *gin.Context) {
     c.JSON(200, response)
 }
 
-// TriggerSync initiates a new sync operation
+// TriggerSync godoc
+// @Summary      Trigger new sync operation
+// @Description  Triggers a new synchronization operation
+// @Tags         sync
+// @Accept       json
+// @Produce      json
+// @Success      201  {string}  string    "Sync trigger is requested"
+// @Router       /sync/trigger [post]
 func TriggerSync(c *gin.Context) {
     err := redis.PublishMessage()
     if err != nil {

@@ -1,0 +1,79 @@
+basePath: /
+definitions:
+  handlers.SyncResponse:
+    properties:
+      data:
+        $ref: '#/definitions/redis.RedisValue'
+      timestamp:
+        type: string
+    type: object
+  redis.RedisValue:
+    properties:
+      message:
+        type: string
+      sha:
+        type: string
+      status:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API for managing sync operations
+  title: Beyond Sync API
+  version: "1.0"
+paths:
+  /sync:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all sync records from Redis
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handlers.SyncResponse'
+            type: array
+      summary: Get all sync records
+      tags:
+      - sync
+  /sync/{timestamp}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a specific sync record by its timestamp
+      parameters:
+      - description: Timestamp of the sync record
+        in: path
+        name: timestamp
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.SyncResponse'
+      summary: Get sync record by timestamp
+      tags:
+      - sync
+  /sync/trigger:
+    post:
+      consumes:
+      - application/json
+      description: Triggers a new synchronization operation
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Sync trigger is requested
+          schema:
+            type: string
+      summary: Trigger new sync operation
+      tags:
+      - sync
+swagger: "2.0"
