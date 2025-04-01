@@ -90,22 +90,30 @@ install_binaries() {
 }
 
 # Create environment file
-#setup_env() {
-#    log "Setting up environment file..."
-#    
-#    if [ ! -f "$INSTALL_DIR/.env" ]; then
-#        cat > "$INSTALL_DIR/.env" << EOF
-#REDIS_HOST=localhost
-#USERNAME=
-#TOKEN=
-#REPONAME=
-## Add other required environment variables
-#EOF
-#        chown $SERVICE_USER:$SERVICE_USER "$INSTALL_DIR/.env"
-#        chmod 600 "$INSTALL_DIR/.env"
-#        log "Please configure the environment variables in $INSTALL_DIR/.env"
-#    fi
-#}
+setup_env() {
+    log "Setting up environment file..."
+    
+    if [ ! -f "$INSTALL_DIR/.env" ]; then
+        # Prompt for environment variables
+        read -p "Enter GitHub username: " github_username
+        read -p "Enter GitHub PAT: " github_token
+        read -p "Enter repository name: " repo_name
+
+        # Create .env file with user input
+        cat > "$INSTALL_DIR/.env" << EOF
+REDIS_HOST="localhost"
+USERNAME=$github_username
+TOKEN=$github_token
+REPONAME=$repo_name
+# Add other required environment variables
+EOF
+        chown $SERVICE_USER:$SERVICE_USER "$INSTALL_DIR/.env"
+        chmod 600 "$INSTALL_DIR/.env"
+        log "Environment file created successfully at $INSTALL_DIR/.env"
+    else
+        log "Environment file already exists at $INSTALL_DIR/.env"
+    fi
+}
 
 # Install systemd services
 install_services() {
@@ -130,7 +138,7 @@ main() {
   setup_directories
   install_dependencies
   install_binaries
-  #setup_env
+  setup_env
   install_services
   log "Installation completed successfully!"
 }
