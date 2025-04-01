@@ -1,61 +1,45 @@
 package ansible
 
 import (
-	"fmt"
-	"os"
-	"os/exec"
-	"strings"
 	"log"
+
+	"github.com/gitops-beyond/beyond-sync/internal/redis"
 )
 
-// Check if target repo is cloned and Ansible installed on host
-func lookForAnsiblePrerequisites() error {
-	// Ansible folder in repo
-	_, err := os.ReadDir("./clonedRepo/ansible")
-	if err != nil {
-		return fmt.Errorf("Ansible directory is not present")
-	}
-	// Ansible CLI installed locally
-	_, err = exec.LookPath("ansible")
-	if err != nil {
-		return fmt.Errorf("Ansible CLI is not present")
-	}
-	return nil
-}
+// RunAnsibleSync orchestrates the ansible playbook execution process
+func RunAnsibleSync(sha string) {
+	// Clone the repository and ensure cleanup
+	err := cloneRepo()
+	defer removeRepo()
 
-// Check if all hosts are reachable
-func pingAllHosts() error {
-	// Go to cloned Ansible code
-	os.Chdir("./clonedRepo/ansible")
-	// Execute ansible ping command
-	pingCmd := exec.Command("ansible", "all", "-i", "inventory", "-m", "ping")
-	// Get the command output
-	byteOutput, err := pingCmd.CombinedOutput()
-	output := string(byteOutput)
-	// Go back to home dir
-	os.Chdir("../../")
 	if err != nil {
-		return fmt.Errorf(output)
+		log.Printf("ERROR: %s", err.Error())
+		redis.AddSyncRecord(sha, "Failed", err.Error())
+		return
 	}
-	if strings.Contains(output, "[WARNING]: No inventory was parsed"){
-		return fmt.Errorf("Inventory is not present")
-	}
-	return nil
-}
 
-// Run Ansible playbook
-func runPlaybook() (string, error) {
-	// Go to cloned Ansible code
-	os.Chdir("./clonedRepo/ansible")
-	// Execute ansible playbook
-	pingCmd := exec.Command("ansible-playbook", "-i", "inventory", "playbook.yml")
-	// Get the command output
-	byteOutput, err := pingCmd.CombinedOutput()
-	log.Println(string(byteOutput))
-	// Go back to home dir
-	os.Chdir("../../")
+	// Check if all required ansible files exist
+	err = lookForAnsiblePrerequisites()
 	if err != nil {
-		return "", err
+		log.Printf("ERROR: %s", err.Error())
+		redis.AddSyncRecord(sha, "Failed", err.Error())
+		return
 	}
-	return string(byteOutput), nil
+
+	// Verify connectivity to all hosts
+	err = pingAllHosts()
+	if err != nil {
+		log.Printf("ERROR: %s", err.Error())
+		redis.AddSyncRecord(sha, "Failed", err.Error())
+		return
+	}
+
+	// Execute the ansible playbook
+	output, err := runPlaybook()
+	if err != nil {
+		log.Printf("ERROR: %s", err.Error())
+		redis.AddSyncRecord(sha, "Failed", err.Error())
+		return
+	}
+	redis.AddSyncRecord(sha, "Synced", output)
 }

@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/gitops-beyond/beyond-sync/internal/webhook"
+	"github.com/gitops-beyond/beyond-sync/internal/sync"
 )
 
 func main() {    
-	webhook.Sync()
+	sync.Sync()
 }
