@@ -50,7 +50,6 @@ func Sync() {
 				lock.Unlock()
 			// Make 30 second pause, if repo has not been updated
 			} else {
-				log.Println("Sleep")
 				time.Sleep(30 * time.Second)
 			}
 		}
