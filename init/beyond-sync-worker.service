@@ -1,0 +1,17 @@
+[Unit]
+Description=Beyond Sync Worker Service
+After=network.target redis.service
+Wants=redis.service
+
+[Service]
+Type=simple
+User=beyond-sync
+Group=beyond-sync
+WorkingDirectory=/opt/beyond-sync
+EnvironmentFile=/opt/beyond-sync/.env
+ExecStart=/opt/beyond-sync/beyond-sync-worker
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
