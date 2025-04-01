@@ -1,13 +1,13 @@
 basePath: /
 definitions:
-  handlers.SyncResponse:
+  handlers.SyncRecord:
     properties:
       data:
-        $ref: '#/definitions/redis.RedisValue'
+        $ref: '#/definitions/redis.SyncData'
       timestamp:
         type: string
     type: object
-  redis.RedisValue:
+  redis.SyncData:
     properties:
       message:
         type: string
@@ -35,7 +35,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/handlers.SyncResponse'
+              $ref: '#/definitions/handlers.SyncRecord'
             type: array
       summary: Get all sync records
       tags:
@@ -57,7 +57,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handlers.SyncResponse'
+            $ref: '#/definitions/handlers.SyncRecord'
       summary: Get sync record by timestamp
       tags:
       - sync

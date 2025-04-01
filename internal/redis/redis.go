@@ -12,7 +12,7 @@ import (
 )
 
 // Struct definition to set sync parameters to save in Redis
-type RedisValue struct {
+type SyncData struct {
     Sha string `json:"sha"`
     Status string `json:"status"`
     Message string `json:"message"`
@@ -40,7 +40,7 @@ func AddSyncRecord(sha string, status string, message string) {
     // Set sync time as key
     key := time.Now().Format("2006-01-02T15:04:05")
     // Put sync parameters to save into variable
-    value, err := json.Marshal(RedisValue{sha, status, message})
+    value, err := json.Marshal(SyncData{sha, status, message})
     if err != nil {
         fmt.Printf("Error encoding json value: %v\n", err)
         return
@@ -54,7 +54,7 @@ func AddSyncRecord(sha string, status string, message string) {
 }
 
 // Get sync record/records
-func GetSyncRecords(query string) (map[string]RedisValue, error) {
+func GetSyncRecords(query string) (map[string]SyncData, error) {
     // Create client connection with Redis
     rdb := redis.NewClient(&redis.Options{
         Addr:     fmt.Sprintf("%s:6379", os.Getenv("REDIS_HOST")),
@@ -80,7 +80,7 @@ func GetSyncRecords(query string) (map[string]RedisValue, error) {
     }
 
     // Map to store data pulled from Redis
-    result := make(map[string]RedisValue)
+    result := make(map[string]SyncData)
     
     // Iterate through keys
     for _, key := range keys {
@@ -90,14 +90,14 @@ func GetSyncRecords(query string) (map[string]RedisValue, error) {
             continue
         }
         
-        // Put value into RedisValue struct
-        var redisValue RedisValue
-        if err := json.Unmarshal([]byte(value), &redisValue); err != nil {
+        // Put value into SyncData struct
+        var syncData SyncData
+        if err := json.Unmarshal([]byte(value), &syncData); err != nil {
             continue
         }
         
         // Put the value into map of Redis key-values
-        result[key] = redisValue
+        result[key] = syncData
     }
 
     return result, nil

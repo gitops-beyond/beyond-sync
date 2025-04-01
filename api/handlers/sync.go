@@ -5,14 +5,14 @@ import (
 	"github.com/gitops-beyond/beyond-sync/internal/redis"
 )
 
-// SyncResponse represents a single sync operation result
-type SyncResponse struct {
+// SyncRecord represents a single sync operation result
+type SyncRecord struct {
     Timestamp string          `json:"timestamp"`
-    Data      redis.RedisValue `json:"data"`
+    Data      redis.SyncData `json:"data"`
 }
 
-// SyncListResponse is a collection of sync responses
-type SyncListResponse []SyncResponse
+// SyncRecords is a collection of sync responses
+type SyncRecords []SyncRecord
 
 // GetAllSyncs godoc
 // @Summary      Get all sync records
@@ -20,7 +20,7 @@ type SyncListResponse []SyncResponse
 // @Tags         sync
 // @Accept       json
 // @Produce      json
-// @Success      200  {array}   SyncResponse
+// @Success      200  {array}   SyncRecord
 // @Router       /sync [get]
 func GetAllSyncs(c *gin.Context) {
     redisRecords, err := redis.GetSyncRecords("*")
@@ -33,9 +33,9 @@ func GetAllSyncs(c *gin.Context) {
     }
 
     // Convert Redis records to response format
-    response := make(SyncListResponse, 0)
+    response := make(SyncRecords, 0)
     for timestamp, value := range redisRecords {
-        sync := SyncResponse{
+        sync := SyncRecord{
             Timestamp: timestamp,
             Data:     value,
         }
@@ -52,7 +52,7 @@ func GetAllSyncs(c *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        timestamp   path      string  true  "Timestamp of the sync record"
-// @Success      200  {object}  SyncResponse
+// @Success      200  {object}  SyncRecord
 // @Router       /sync/{timestamp} [get]
 func GetSyncByDate(c *gin.Context) {
     redisKey := c.Param("timestamp")
@@ -65,7 +65,7 @@ func GetSyncByDate(c *gin.Context) {
         return
     }
 
-    response := SyncResponse{
+    response := SyncRecord{
         Timestamp: redisKey,
         Data: redisValue[redisKey],
     }

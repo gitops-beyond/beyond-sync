@@ -34,7 +34,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/handlers.SyncResponse"
+                                "$ref": "#/definitions/handlers.SyncRecord"
                             }
                         }
                     }
@@ -90,7 +90,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handlers.SyncResponse"
+                            "$ref": "#/definitions/handlers.SyncRecord"
                         }
                     }
                 }
@@ -98,18 +98,18 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "handlers.SyncResponse": {
+        "handlers.SyncRecord": {
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/redis.RedisValue"
+                    "$ref": "#/definitions/redis.SyncData"
                 },
                 "timestamp": {
                     "type": "string"
                 }
             }
         },
-        "redis.RedisValue": {
+        "redis.SyncData": {
             "type": "object",
             "properties": {
                 "message": {
