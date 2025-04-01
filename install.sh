@@ -96,7 +96,8 @@ setup_env() {
     if [ ! -f "$INSTALL_DIR/.env" ]; then
         # Prompt for environment variables
         read -p "Enter GitHub username: " github_username
-        read -p "Enter GitHub PAT: " github_token
+        read -s -p "Enter GitHub token (output is hidden): " github_token
+        echo # Add a newline after hidden input
         read -p "Enter repository name: " repo_name
 
         # Create .env file with user input
