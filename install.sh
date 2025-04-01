@@ -105,7 +105,6 @@ REDIS_HOST="localhost"
 USERNAME=$github_username
 TOKEN=$github_token
 REPONAME=$repo_name
-# Add other required environment variables
 EOF
         chown $SERVICE_USER:$SERVICE_USER "$INSTALL_DIR/.env"
         chmod 600 "$INSTALL_DIR/.env"
