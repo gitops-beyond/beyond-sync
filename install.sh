@@ -131,8 +131,8 @@ install_services() {
     systemctl enable beyond-sync-worker
 
     # Start services
-    systemctl enable beyond-sync-api
-    systemctl enable beyond-sync-worker
+    systemctl start beyond-sync-api
+    systemctl start beyond-sync-worker
 }
 
 # Main installation process
